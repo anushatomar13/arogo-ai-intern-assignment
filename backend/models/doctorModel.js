@@ -8,8 +8,7 @@ const doctorSchema = new mongoose.Schema(
     specialization: { type: String, required: true },
     experience: { type: Number, required: true },
     phone: { type: String, required: true },
-    feesPerConsultation: { type: Number, required: true },
-    available: { type: Boolean, default: true },
+    feesPerConsultation: { type: Number, required: true }
   },
   { timestamps: true }
 );
