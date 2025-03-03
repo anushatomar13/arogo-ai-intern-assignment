@@ -8,7 +8,8 @@ const doctorSchema = new mongoose.Schema(
     specialization: { type: String, required: true },
     experience: { type: Number, required: true },
     phone: { type: String, required: true },
-    feesPerConsultation: { type: Number, required: true }
+    feesPerConsultation: { type: Number, required: true },
+    location: { type: String, required: true },
   },
   { timestamps: true }
 );
