@@ -36,4 +36,29 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
-module.exports = { registerDoctor, getAllDoctors };
+const getDoctorsBySearch = async (req, res) => {
+    try {
+      const { specialization, name, location } = req.query;
+  
+      const query = {};
+  
+      if (specialization) {
+        query.specialization = { $regex: specialization, $options: "i" }; 
+      }
+      if (name) {
+        query.name = { $regex: name, $options: "i" }; 
+      }
+      if (location) {
+        query.location = { $regex: location, $options: "i" }; 
+      }
+  
+      // Query doctors based on filters
+      const doctors = await Doctor.find(query).select("-password"); 
+  
+      res.status(200).json(doctors);
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  };
+  
+module.exports = { registerDoctor, getAllDoctors, getDoctorsBySearch };
