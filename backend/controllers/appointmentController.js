@@ -1,5 +1,6 @@
 const Appointment = require("../models/appointmentModel");
 const Doctor = require("../models/doctorModel");
+const sendEmail = require("../utils/mailer");
 const mongoose = require("mongoose");
 
 // Book an appointment
@@ -30,6 +31,30 @@ const bookAppointment = async (req, res) => {
     const appointment = new Appointment({ userId, doctorId, date, time, status: "approved" });
     await appointment.save();
 
+    if (req.user.email) {
+      try {
+        await sendEmail(
+          req.user.email,
+          "Appointment Confirmation",
+          `Your appointment with Dr. ${doctor.name} on ${appointment.date} at ${appointment.time} has been successfully booked.`
+        );
+      } catch (error) {
+        console.error("Failed to send patient email:", error);
+      }
+    }
+
+    if (doctor.email) {
+      try {
+        await sendEmail(
+          doctor.email,
+          "New Appointment Booking",
+          `You have a new appointment with ${req.user.name} on ${appointment.date} at ${appointment.time}.`
+        );
+      } catch (error) {
+        console.error("Failed to send doctor email:", error);
+      }
+    }
+
     res.status(201).json({ message: "Appointment booked successfully", appointment });
   } catch (error) {
     console.error("Error booking appointment:", error);
@@ -53,6 +78,35 @@ const cancelAppointment = async (req, res) => {
     const appointment = await Appointment.findById(appointmentId);
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    const doctor = await Doctor.findById(appointment.doctorId);
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+
+    if (req.user.email) {
+      try {
+        await sendEmail(
+          req.user.email,
+          "Appointment Cancellation",
+          `Your appointment with Dr. ${doctor.name} on ${appointment.date} at ${appointment.time} has been canceled.`
+        );
+      } catch (error) {
+        console.error("Failed to send patient email:", error);
+      }
+    }
+
+    if (doctor.email) {
+      try {
+        await sendEmail(
+          doctor.email,
+          "Appointment Canceled",
+          `The appointment with ${req.user.name} on ${appointment.date} at ${appointment.time} has been canceled.`
+        );
+      } catch (error) {
+        console.error("Failed to send doctor email:", error);
+      }
     }
 
     await Appointment.findByIdAndDelete(appointmentId);
