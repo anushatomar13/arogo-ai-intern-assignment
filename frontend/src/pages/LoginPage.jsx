@@ -10,13 +10,14 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const data = await loginUser({ email, password });
-      localStorage.setItem("token", data.token);
-      navigate("/dashboard");
+      const res = await loginUser(email, password); 
+      localStorage.setItem("userInfo", JSON.stringify(res.data)); 
+      navigate("/dashboard"); 
     } catch (error) {
-      console.error("Login failed:", error.response?.data?.message);
+      console.error("Login failed:", error.response?.data?.message || "An error occurred");
     }
   };
+
 
   return (
     <div>
