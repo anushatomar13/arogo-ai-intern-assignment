@@ -1,11 +1,17 @@
 const mongoose = require("mongoose");
 
 const availabilitySchema = new mongoose.Schema({
-  doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  slots: [
+  doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor", required: true },
+  workingHours: [
     {
-      date: { type: String, required: true },
-      time: { type: String, required: true }, 
+      day: { type: String, required: true },
+      slots: [{ type: String, required: true }], 
+    },
+  ],
+  locations: [
+    {
+      name: { type: String, required: true }, 
+      address: { type: String, required: true }, 
     },
   ],
 });
