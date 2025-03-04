@@ -141,7 +141,7 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
-//Get all appointments
+//Get all appointments [User]
 const getUserAppointments = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -154,5 +154,26 @@ const getUserAppointments = async (req, res) => {
   }
 };
 
+//Get all appointments [Doctor]
 
-module.exports = { bookAppointment, cancelAppointment, getUserAppointments };
+const getDoctorAppointments = async (req, res) => {
+  try {
+    const doctorId = req.user.id; // Assuming the logged-in user is a doctor
+
+    if (!mongoose.Types.ObjectId.isValid(doctorId)) {
+      return res.status(400).json({ message: "Invalid doctor ID" });
+    }
+
+    const appointments = await Appointment.find({ doctorId }).sort({ date: 1, time: 1 });
+
+    res.status(200).json({ appointments });
+  } catch (error) {
+    console.error("Error fetching doctor's appointments:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+
+module.exports = { bookAppointment, cancelAppointment, getUserAppointments, getDoctorAppointments };
