@@ -7,16 +7,13 @@ const registerDoctor = async (req, res) => {
   try {
     const { name, email, password, specialization, experience, phone, feesPerConsultation, location } = req.body;
 
-    // Check if doctor already exists
     const existingDoctor = await Doctor.findOne({ email });
     if (existingDoctor) {
       return res.status(400).json({ message: "Doctor already exists" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new doctor
     const newDoctor = new Doctor({
       name,
       email,
@@ -29,7 +26,6 @@ const registerDoctor = async (req, res) => {
     });
     await newDoctor.save();
 
-    // Generate JWT with doctor role
     const token = jwt.sign(
       { id: newDoctor._id, role: "doctor" },
       process.env.JWT_SECRET,
@@ -41,7 +37,6 @@ const registerDoctor = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // Get all doctors
 const getAllDoctors = async (req, res) => {
@@ -70,7 +65,6 @@ const getDoctorsBySearch = async (req, res) => {
         query.location = { $regex: location, $options: "i" }; 
       }
   
-      // Query doctors based on filters
       const doctors = await Doctor.find(query).select("-password"); 
   
       res.status(200).json(doctors);
@@ -93,6 +87,7 @@ const getDoctorById = async (req, res) => {
   }
 };
 
+//Update doctor's profile
 const updateDoctorProfile = async (req, res) => {
   try {
     const doctorId = req.params.id;
