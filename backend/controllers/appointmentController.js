@@ -173,7 +173,65 @@ const getDoctorAppointments = async (req, res) => {
   }
 };
 
+//Reschedule appointments
+const rescheduleAppointments = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { appointmentId, newDate, newTime } = req.body;
+    const userId = req.user.id; 
+
+    if (!appointmentId || !newDate || !newTime) {
+      return res.status(400).json({ message: "Appointment ID, new date, and new time are required" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+      return res.status(400).json({ message: "Invalid appointment ID" });
+    }
+
+    const appointment = await Appointment.findById(appointmentId).session(session);
+    if (!appointment) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    if (appointment.userId.toString() !== userId) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(403).json({ message: "Not authorized to reschedule this appointment" });
+    }
+
+    const existingAppointment = await Appointment.findOne({
+      doctorId: appointment.doctorId,
+      date: newDate,
+      time: newTime,
+    }).session(session);
+
+    if (existingAppointment) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ message: "Time slot already booked" });
+    }
+
+    appointment.date = newDate;
+    appointment.time = newTime;
+    appointment.updatedAt = new Date();
+    await appointment.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({ message: "Appointment rescheduled successfully", appointment });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error rescheduling appointment:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 
-module.exports = { bookAppointment, cancelAppointment, getUserAppointments, getDoctorAppointments };
+module.exports = { bookAppointment, cancelAppointment, getUserAppointments, getDoctorAppointments,rescheduleAppointments };
