@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/authService";
 import { setUser } from "../redux/userSlice"; 
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,15 +13,14 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await loginUser(email, password); 
-      localStorage.setItem("token", res.data.token); 
-      dispatch(setUser(res.data)); 
-      navigate("/dashboard"); 
+      const res = await loginUser({ email, password });
+      localStorage.setItem("token", res.token); 
+      dispatch(setUser(res.user)); 
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login failed:", error.response?.data?.message || "An error occurred");
     }
   };
-
 
   return (
     <div>
