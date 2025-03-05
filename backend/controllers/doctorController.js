@@ -2,7 +2,7 @@ const Doctor = require("../models/doctorModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Register a doctor
+//Register a doctor
 const registerDoctor = async (req, res) => {
   try {
     const { name, email, password, specialization, experience, phone, feesPerConsultation, location } = req.body;
@@ -38,6 +38,33 @@ const registerDoctor = async (req, res) => {
   }
 };
 
+// Doctor login
+const loginDoctor = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const doctor = await Doctor.findOne({ email });
+    if (!doctor) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(password, doctor.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { id: doctor._id, role: "doctor" },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({ token, doctor });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // Get all doctors
 const getAllDoctors = async (req, res) => {
   try {
@@ -48,7 +75,7 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
-//Get doctor by location or specialization
+// Get doctor by location or specialization
 const getDoctorsBySearch = async (req, res) => {
     try {
       const { specialization, name, location } = req.query;
@@ -73,7 +100,7 @@ const getDoctorsBySearch = async (req, res) => {
     }
 };
 
-//Get doctor by their ID
+// Get doctor by their ID
 const getDoctorById = async (req, res) => {
   try {
     const doctor = await Doctor.findById(req.params.id).select("-password");
@@ -87,7 +114,7 @@ const getDoctorById = async (req, res) => {
   }
 };
 
-//Update doctor's profile
+// Update doctor's profile
 const updateDoctorProfile = async (req, res) => {
   try {
     const doctorId = req.params.id;
@@ -119,4 +146,11 @@ const updateDoctorProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerDoctor, getAllDoctors, getDoctorsBySearch,getDoctorById,updateDoctorProfile };
+module.exports = { 
+  registerDoctor, 
+  loginDoctor,
+  getAllDoctors, 
+  getDoctorsBySearch, 
+  getDoctorById, 
+  updateDoctorProfile
+};
