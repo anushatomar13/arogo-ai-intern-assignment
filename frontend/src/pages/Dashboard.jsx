@@ -66,56 +66,56 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      <div className="w-64 bg-gray-800 p-6 flex flex-col justify-between">
+    <div style={{ display: "flex", height: "100vh", backgroundColor: "#121212", color: "white" }}>
+      <div style={{ width: "250px", backgroundColor: "#1e1e1e", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div>
-          <h2 className="text-2xl font-bold mb-6">HealthCare</h2>
-          <nav className="space-y-4">
-            <button className="flex items-center space-x-2 w-full p-3 rounded-lg bg-gray-700 hover:bg-gray-600" onClick={() => navigate("/dashboard")}>
-              <FaHome /> <span>Dashboard</span>
+          <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}>HealthCare</h2>
+          <nav style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+            <button style={{ backgroundColor: "#333", padding: "10px", borderRadius: "5px", color: "white", border: "none", cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
+              <FaHome /> Dashboard
             </button>
             {user.role === "doctor" && (
-              <>
-                <button
-                  className="flex items-center space-x-2 w-full p-3 rounded-lg bg-gray-700 hover:bg-gray-600"
-                  onClick={handleShowAppointments}
-                >
-                  <FaCalendarAlt /> <span>See All Appointments</span>
-                </button>
-              </>
+              <button style={{ backgroundColor: "#333", padding: "10px", borderRadius: "5px", color: "white", border: "none", cursor: "pointer" }} onClick={handleShowAppointments}>
+                <FaCalendarAlt /> See All Appointments
+              </button>
             )}
-            <button className="flex items-center space-x-2 w-full p-3 rounded-lg bg-red-600 hover:bg-red-700" onClick={handleLogout}>
-              <FaSignOutAlt /> <span>Logout</span>
+            {user.role === "patient" && (
+              <button style={{ backgroundColor: "#4CAF50", padding: "10px", borderRadius: "5px", color: "white", border: "none", cursor: "pointer" }} onClick={handleSearchDoctors}>
+                <FaSearch /> Book an Appointment
+              </button>
+            )}
+            <button style={{ backgroundColor: "#D32F2F", padding: "10px", borderRadius: "5px", color: "white", border: "none", cursor: "pointer" }} onClick={handleLogout}>
+              <FaSignOutAlt /> Logout
             </button>
           </nav>
         </div>
       </div>
 
-      <div className="flex-1 p-6">
-        <h2 className="text-3xl font-bold mb-6">Welcome, {user.name}</h2>
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl text-center mb-6">
+      <div style={{ flex: 1, padding: "20px" }}>
+        <h2 style={{ fontSize: "28px", fontWeight: "bold", marginBottom: "20px" }}>Welcome, {user.name}</h2>
+        <div style={{ backgroundColor: "#1e1e1e", padding: "20px", borderRadius: "10px", textAlign: "center", marginBottom: "20px" }}>
           {user.role === "doctor" ? (
-            <p className="text-gray-300">Manage your patients and appointments.</p>
+            <p>Manage your patients and appointments.</p>
           ) : (
-            <p className="text-gray-300">Book appointments and check your medical history.</p>
+            <p>Book appointments and check your medical history.</p>
           )}
         </div>
 
         {user.role === "doctor" && showAppointments && (
-          <div className="mt-6 p-4 bg-gray-800 rounded-lg shadow-md w-full max-w-2xl">
-            <h3 className="text-xl font-bold mb-4">Appointments</h3>
+          <div style={{ marginTop: "20px", padding: "15px", backgroundColor: "#1e1e1e", borderRadius: "10px" }}>
+            <h3 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "10px" }}>Appointments</h3>
             {loading && <p>Loading appointments...</p>}
-            {error && <p className="text-red-500">{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
             {!loading && !error && appointments.length === 0 && <p>No appointments found.</p>}
             {!loading && !error && appointments.length > 0 && (
-              <ul className="space-y-3">
+              <ul>
                 {appointments.map((appointment) => (
-                  <li key={appointment._id} className="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
+                  <li key={appointment._id} style={{ backgroundColor: "#333", padding: "10px", borderRadius: "5px", marginBottom: "10px", display: "flex", justifyContent: "space-between" }}>
                     <div>
-                      <p className="text-lg">Patient: {appointment.userId.name}</p>
-                      <p className="text-sm text-gray-300">{appointment.date} at {appointment.time}</p>
+                      <p style={{ fontSize: "16px" }}>Patient: {appointment.userId.name}</p>
+                      <p style={{ fontSize: "14px", color: "#bbb" }}>{appointment.date} at {appointment.time}</p>
                     </div>
-                    <span className={`text-sm px-2 py-1 rounded ${appointment.status === "approved" ? "bg-green-500" : "bg-yellow-500"}`}>
+                    <span style={{ padding: "5px 10px", borderRadius: "5px", backgroundColor: appointment.status === "approved" ? "#4CAF50" : "#FFC107", color: "black" }}>
                       {appointment.status}
                     </span>
                   </li>
