@@ -72,7 +72,6 @@ const bookAppointment = async (req, res) => {
   }
 };
 
-
 // Cancel an appointment
 const cancelAppointment = async (req, res) => {
   const session = await mongoose.startSession();
